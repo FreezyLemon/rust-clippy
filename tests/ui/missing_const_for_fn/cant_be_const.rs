@@ -126,3 +126,38 @@ with_span! {
     span
     fn dont_check_in_proc_macro() {}
 }
+
+mod destructor_runs_drop {
+    struct D;
+    struct S {
+        inner: D,
+    }
+    enum E {
+        Value(D),
+    }
+
+    impl Drop for D {
+        fn drop(&mut self) {}
+    }
+
+    impl S {
+        fn d(self) -> D {
+            self.inner
+        }
+    }
+
+    impl E {
+        fn d(self) -> D {
+            let Self::Value(d) = self;
+            d
+        }
+    }
+
+    fn struct_to_d(s: S) -> D {
+        s.inner
+    }
+
+    fn tuple_to_d(t: (D, usize)) -> D {
+        t.0
+    }
+}
