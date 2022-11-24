@@ -1,7 +1,6 @@
 use clippy_utils::diagnostics::span_lint;
 use clippy_utils::msrvs::{self, Msrv};
 use clippy_utils::qualify_min_const_fn::is_min_const_fn;
-use clippy_utils::ty::has_drop;
 use clippy_utils::{fn_has_unsatisfiable_preds, is_entrypoint_fn, is_from_proc_macro, trait_ref_of_method};
 use rustc_hir as hir;
 use rustc_hir::def_id::CRATE_DEF_ID;
@@ -167,7 +166,7 @@ fn method_accepts_droppable(cx: &LateContext<'_>, param_tys: &[hir::Ty<'_>]) -> 
     // If any of the params are droppable, return true
     param_tys.iter().any(|hir_ty| {
         let ty_ty = hir_ty_to_ty(cx.tcx, hir_ty);
-        has_drop(cx, ty_ty)
+        ty_ty.needs_drop(cx.tcx, cx.param_env)
     })
 }
 
