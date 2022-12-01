@@ -132,12 +132,23 @@ mod destructor_runs_drop {
     struct S {
         inner: D,
     }
+
+    struct S2 {
+        inner: S,
+    }
+
     enum E {
         Value(D),
     }
 
     impl Drop for D {
         fn drop(&mut self) {}
+    }
+
+    impl S2 {
+        fn d(self) -> D {
+            self.inner.inner
+        }
     }
 
     impl S {
